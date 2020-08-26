@@ -2,6 +2,8 @@
 # _*_ coding:utf-8 _*_
 # @Author  : lusheng
 import os
+import time
+
 from openpyxl import load_workbook
 
 
@@ -9,13 +11,14 @@ def get_dir():  # 获取当前文件夹下非总表的excel文件列表
     dir_list = []
     for root, dirs, files in os.walk('./'):
         for file in files:
-            if os.path.splitext(file)[1] == '.xlsx' and file != '总表.xlsx':
+            if os.path.splitext(file)[1] == '.xlsx' and file != '总表.xlsx' and file != '总表模板.xlsx':
                 dir_list.append(file)
     return dir_list
 
 
 def get_sheets(dir):
-    wb_fenbiao = load_workbook(dir, data_only=False)
+    print("正在处理表格 %s" % dir)
+    wb_fenbiao = load_workbook(dir, data_only=True)
     sheet_list = wb_fenbiao.sheetnames
     print(sheet_list)
     return wb_fenbiao, sheet_list
@@ -43,16 +46,16 @@ def get_rows_data(wb_fenbiao, sheet):
 
 def main():
     # 总表名称
-    excel_path = '总表.xlsx'
+    excel_path = '总表模板.xlsx'
     # 打开已经存在的表格并实例化，准备进行修改操作
     wb = load_workbook(excel_path)
     zongbiao = wb["Sheet1"]
     # n_of_rows = zongbiao.max_row
     n_of_cols = zongbiao.max_column
-    n_of_rows = 5
+    n_of_rows = 6
     # print(n_of_rows,n_of_cols)
     dir_list = get_dir()
-    print(dir_list)
+    # print(dir_list)
     for dir in dir_list:
         wb_fenbiao, sheets = get_sheets(dir)
         for sheet in sheets:
@@ -62,7 +65,8 @@ def main():
                     zongbiao.cell(row=n_of_rows, column=n + 1, value=row[n])
                 n_of_rows = n_of_rows + 1
             wb.save('总表.xlsx')
-
+    print("处理完毕，程序即将关闭")
+    time.sleep(3)
     wb.close()
 
 
